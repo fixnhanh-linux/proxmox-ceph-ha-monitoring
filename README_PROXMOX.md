@@ -42,18 +42,26 @@ Sau khi chạy xong, Ceph sẽ mở port `9283` trên máy chủ đang giữ quy
 
 ---
 
-## 3. Chạy Kịch Bản Cài Đặt Tự Động (Setup Script)
+## 3. Tải Code và Cài Đặt Tự Động (Setup Script)
 Để mọi thứ đơn giản và nhanh gọn nhất, một kịch bản cài đặt tự động (`setup-proxmox-ceph-deco-dms.sh`) đã được tạo sẵn để tự động hóa toàn bộ quá trình kiểm tra môi trường, tạo file cấu hình và khởi động Docker.
 
 **Vị trí chạy lệnh:** Tại máy chủ trung tâm giám sát (Nơi bạn dùng để cài Docker/Prometheus, **không** phải chạy trên máy chủ Proxmox).
 
 ### Các bước thực hiện:
-**Bước 1:** Mở Terminal (Linux/Ubuntu/CentOS) hoặc Git Bash (Windows) truy cập vào đúng thư mục chứa đoạn mã này.
-**Bước 2:** Cấp quyền thực thi cho file script:
+
+**Bước 1: Tải bộ source code này về máy chủ**
+Mở Terminal (Linux/Ubuntu/CentOS) và chạy lệnh sau để tải toàn bộ code từ GitHub về:
+```bash
+git clone https://github.com/fixnhanh-linux/proxmox-ceph-ha-monitoring.git
+cd proxmox-ceph-ha-monitoring
+```
+
+**Bước 2: Cấp quyền thực thi cho file script**
 ```bash
 chmod +x setup-proxmox-ceph-deco-dms.sh
 ```
-**Bước 3:** Chạy kịch bản cài đặt:
+
+**Bước 3: Chạy kịch bản cài đặt**
 ```bash
 ./setup-proxmox-ceph-deco-dms.sh
 ```
