@@ -28,14 +28,14 @@ check_port() {
 echo "⚠️ Yeu cau cau hinh thong tin he thong:"
 
 read -p "🔹 Nhap Ten Project (Mac dinh: dms-monitoring): " PROJECT_NAME
-PROJECT_NAME=$${PROJECT_NAME:-dms-monitoring}
+PROJECT_NAME=${PROJECT_NAME:-dms-monitoring}
 
-if docker ps -a --format '{{.Names}}' | grep -q "$${PROJECT_NAME}"; then
-    echo "⚠️ Phat hien cac container cua project '$${PROJECT_NAME}' dang ton tai!"
+if docker ps -a --format '{{.Names}}' | grep -q "${PROJECT_NAME}"; then
+    echo "⚠️ Phat hien cac container cua project '${PROJECT_NAME}' dang ton tai!"
     read -p "❓ Ban co muon xoa va tai tao lai khong? (y/n, Mac dinh: y): " REBUILD
-    REBUILD=$${REBUILD:-y}
+    REBUILD=${REBUILD:-y}
     if [[ "$REBUILD" == "y" || "$REBUILD" == "Y" ]]; then
-        docker compose -p "$${PROJECT_NAME}" down 2>/dev/null || true
+        docker compose -p "${PROJECT_NAME}" down 2>/dev/null || true
     else
         echo "🛑 Da huy cai dat do xoa project bi tu choi."
         exit 0
@@ -44,7 +44,7 @@ fi
 
 read -p "🔹 Nhap IP may chu Proxmox (Vi du: 10.8.10.21): " PVE_IP
 read -p "🔹 Nhap User name (Mac dinh: root@pam): " PVE_USER
-PVE_USER=$${PVE_USER:-root@pam}
+PVE_USER=${PVE_USER:-root@pam}
 read -p "🔹 Nhap Token Name (Vi du: monitor-grafana): " PVE_TOKEN_NAME
 read -p "🔹 Nhap Token Value (Secret Key): " PVE_TOKEN_VALUE
 
@@ -86,25 +86,25 @@ version: "3.9"
 services:
   pve-exporter:
     image: prompve/prometheus-pve-exporter:latest
-    container_name: $${PROJECT_NAME}-pve-exporter
+    container_name: ${PROJECT_NAME}-pve-exporter
     volumes:
       - ./proxmox_credentials.yml:/etc/prometheus/pve.yml:ro
     ports:
-      - "$${PVE_PORT}:9221"
+      - "${PVE_PORT}:9221"
     restart: unless-stopped
   node-exporter:
     image: prom/node-exporter:latest
-    container_name: $${PROJECT_NAME}-node-exporter
+    container_name: ${PROJECT_NAME}-node-exporter
     volumes:
       - ./metrics:/etc/node-exporter:ro
     command:
       - '--collector.textfile.directory=/etc/node-exporter'
     ports:
-      - "$${NODE_PORT}:9100"
+      - "${NODE_PORT}:9100"
     restart: unless-stopped
   ha-exporter:
     image: alpine:latest
-    container_name: $${PROJECT_NAME}-ha-exporter
+    container_name: ${PROJECT_NAME}-ha-exporter
     command:
       - /bin/sh
       - -c
@@ -158,17 +158,17 @@ fi
 
 # 5. Chay Docker Compose
 echo "🚀 Dang khoi dong he thong Exporter..."
-docker compose -p "$${PROJECT_NAME}" up -d --build --force-recreate
+docker compose -p "${PROJECT_NAME}" up -d --build --force-recreate
 
 # 6. Kiem tra trang thai
 echo "==========================================================="
 echo "✅ HOAN TAT! Dang kiem tra trang thai cac dich vu..."
 echo "==========================================================="
 sleep 3
-docker compose -p "$${PROJECT_NAME}" ps
+docker compose -p "${PROJECT_NAME}" ps
 
 echo ""
 echo "🎯 THONG TIN CAU HINH QUAN TRONG:"
 echo "Neu ban doi cong o buoc truoc, hay cap nhat file prometheus.yml cho cac targets sau:"
-echo "  - PVE Exporter Port: $${PVE_PORT}"
-echo "  - Node Exporter Port: $${NODE_PORT}"
+echo "  - PVE Exporter Port: ${PVE_PORT}"
+echo "  - Node Exporter Port: ${NODE_PORT}"
