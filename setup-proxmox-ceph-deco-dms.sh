@@ -175,6 +175,8 @@ SCRAPE_DIR="/etc/prometheus/scrape_configs"
 if [ -d "$SCRAPE_DIR" ]; then
     SCRAPE_FILE="$SCRAPE_DIR/${PROJECT_NAME}.yml"
     CURRENT_DIR=$(pwd)
+    CURRENT_IP=$(hostname -I | awk '{print $1}')
+    
     echo "📝 Dang tu dong tao cau hinh Prometheus tai $SCRAPE_FILE ..."
     cat <<EOF > "$SCRAPE_FILE"
   - job_name: '${PROJECT_NAME}-proxmox'
@@ -188,7 +190,7 @@ if [ -d "$SCRAPE_DIR" ]; then
       - source_labels: [__param_target]
         target_label: instance
       - target_label: __address__
-        replacement: 127.0.0.1:${PVE_PORT}
+        replacement: ${CURRENT_IP}:${PVE_PORT}
 
   - job_name: '${PROJECT_NAME}-ceph'
     file_sd_configs:
@@ -198,7 +200,7 @@ if [ -d "$SCRAPE_DIR" ]; then
   - job_name: '${PROJECT_NAME}-node_exporter_ha'
     static_configs:
       - targets:
-        - '127.0.0.1:${NODE_PORT}'
+        - '${CURRENT_IP}:${NODE_PORT}'
 EOF
     echo "✅ Da tao xong file $SCRAPE_FILE!"
     
