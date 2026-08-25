@@ -1,40 +1,40 @@
 #!/bin/bash
 
 echo "==========================================================="
-echo "  KỊCH BẢN CÀI ĐẶT: PROXMOX - CEPH PROMETHEUS DECO - DMS"
+echo "  KICH BAN CAI DAT: PROXMOX - CEPH PROMETHEUS DECO - DMS"
 echo "==========================================================="
 echo ""
 
-# 1. Kiểm tra Docker và Docker Compose
+# 1. Kiem tra Docker va Docker Compose
 if ! command -v docker &> /dev/null; then
-    echo "❌ Không tìm thấy Docker! Vui lòng cài đặt Docker trước khi chạy script."
+    echo "❌ Khong tim thay Docker! Vui long cai dat Docker truoc khi chay script."
     exit 1
 fi
 
 if ! docker compose version &> /dev/null && ! docker-compose --version &> /dev/null; then
-    echo "❌ Không tìm thấy Docker Compose! Vui lòng cài đặt Docker Compose."
+    echo "❌ Khong tim thay Docker Compose! Vui long cai dat Docker Compose."
     exit 1
 fi
 
-echo "✅ Đã tìm thấy Docker và Docker Compose."
+echo "✅ Da tim thay Docker va Docker Compose."
 
-# 2. Kiểm tra file cấu hình credentials
+# 2. Kiem tra file cau hinh credentials
 CREDENTIALS_FILE="proxmox_credentials.yml"
 if [ ! -f "$CREDENTIALS_FILE" ] || grep -q "PLEASE_ENTER_YOUR_SECRET_TOKEN_HERE" "$CREDENTIALS_FILE"; then
-    echo "⚠️ Yêu cầu cấu hình thông tin kết nối Proxmox API:"
+    echo "⚠️ Yeu cau cau hinh thong tin ket noi Proxmox API:"
     
-    read -p "🔹 Nhập IP máy chủ Proxmox (Ví dụ: 10.8.10.21): " PVE_IP
-    read -p "🔹 Nhập User name (Mặc định: root@pam): " PVE_USER
+    read -p "🔹 Nhap IP may chu Proxmox (Vi du: 10.8.10.21): " PVE_IP
+    read -p "🔹 Nhap User name (Mac dinh: root@pam): " PVE_USER
     PVE_USER=$${PVE_USER:-root@pam}
-    read -p "🔹 Nhập Token Name (Ví dụ: monitor-grafana): " PVE_TOKEN_NAME
-    read -p "🔹 Nhập Token Value (Secret Key): " PVE_TOKEN_VALUE
+    read -p "🔹 Nhap Token Name (Vi du: monitor-grafana): " PVE_TOKEN_NAME
+    read -p "🔹 Nhap Token Value (Secret Key): " PVE_TOKEN_VALUE
 
     if [ -z "$PVE_TOKEN_VALUE" ] || [ -z "$PVE_IP" ] || [ -z "$PVE_TOKEN_NAME" ]; then
-        echo "❌ Lỗi: Bạn không được để trống IP, Token Name hoặc Token Value!"
+        echo "❌ Loi: Ban khong duoc de trong IP, Token Name hoac Token Value!"
         exit 1
     fi
 
-    echo "Đang tạo file cấu hình $CREDENTIALS_FILE..."
+    echo "Dang tao file cau hinh $CREDENTIALS_FILE..."
     cat <<EOF > $CREDENTIALS_FILE
 default:
   user: $PVE_USER
@@ -43,31 +43,31 @@ default:
   verify_ssl: false
   api_host: $PVE_IP
 EOF
-    echo "✅ Đã lưu cấu hình kết nối!"
+    echo "✅ Da luu cau hinh ket noi!"
 fi
 
-echo "✅ Đã tìm thấy cấu hình Token hợp lệ."
+echo "✅ Da tim thay cau hinh Token hop le."
 
-# 3. Khởi tạo thư mục metrics nếu chưa có
+# 3. Khoi tao thu muc metrics neu chua co
 if [ ! -d "metrics" ]; then
-    echo "📁 Đang tạo thư mục ./metrics..."
+    echo "📁 Dang tao thu muc ./metrics..."
     mkdir -p metrics
     chmod 777 metrics
 fi
 
-# 4. Chạy Docker Compose
-echo "🚀 Đang khởi động hệ thống Exporter..."
+# 4. Chay Docker Compose
+echo "🚀 Dang khoi dong he thong Exporter..."
 docker compose up -d --build --force-recreate
 
-# 5. Kiểm tra trạng thái
+# 5. Kiem tra trang thai
 echo "==========================================================="
-echo "✅ HOÀN TẤT! Đang kiểm tra trạng thái các dịch vụ..."
+echo "✅ HOAN TAT! Dang kiem tra trang thai cac dich vu..."
 echo "==========================================================="
 sleep 3
 docker compose ps
 
 echo ""
-echo "🎯 BƯỚC TIẾP THEO:"
-echo "1. Nếu các dịch vụ (pve-exporter, ha-exporter, node-exporter) đều báo 'Up', hệ thống đã chạy tốt."
-echo "2. Hãy copy nội dung file prometheus/prometheus.yml dán vào máy chủ Prometheus của bạn và restart Prometheus."
-echo "3. Vào Grafana Import file Dashboard JSON để xem kết quả."
+echo "🎯 BUOC TIEP THEO:"
+echo "1. Neu cac dich vu (pve-exporter, ha-exporter, node-exporter) deu bao 'Up', he thong da chay tot."
+echo "2. Kiem tra file metrics tu dong sinh ra trong thu muc ./metrics"
+echo "3. Vao Grafana Import file Dashboard JSON de xem ket qua."
