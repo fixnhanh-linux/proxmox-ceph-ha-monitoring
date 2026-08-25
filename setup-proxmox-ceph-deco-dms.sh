@@ -170,7 +170,45 @@ sleep 3
 docker compose -p "${PROJECT_NAME}" ps
 
 echo ""
-echo "🎯 THONG TIN CAU HINH QUAN TRONG:"
-echo "Neu ban doi cong o buoc truoc, hay cap nhat file prometheus.yml cho cac targets sau:"
-echo "  - PVE Exporter Port: ${PVE_PORT}"
-echo "  - Node Exporter Port: ${NODE_PORT}"
+# 7. Tu dong tao file cho Prometheus scrape_configs
+SCRAPE_DIR="/etc/prometheus/scrape_configs"
+if [ -d "$SCRAPE_DIR" ]; then
+    SCRAPE_FILE="$SCRAPE_DIR/${PROJECT_NAME}.yml"
+    CURRENT_DIR=$(pwd)
+    echo "📝 Dang tu dong tao cau hinh Prometheus tai $SCRAPE_FILE ..."
+    cat <<EOF > "$SCRAPE_FILE"
+  - job_name: '${PROJECT_NAME}-proxmox'
+    metrics_path: /pve
+    file_sd_configs:
+      - files:
+        - '${CURRENT_DIR}/metrics/proxmox_targets.json'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: 127.0.0.1:${PVE_PORT}
+
+  - job_name: '${PROJECT_NAME}-ceph'
+    file_sd_configs:
+      - files:
+        - '${CURRENT_DIR}/metrics/ceph_targets.json'
+
+  - job_name: '${PROJECT_NAME}-node_exporter_ha'
+    static_configs:
+      - targets:
+        - '127.0.0.1:${NODE_PORT}'
+EOF
+    echo "✅ Da tao xong file $SCRAPE_FILE!"
+    
+    echo "🔄 Dang gui lenh Reload den Prometheus..."
+    curl -s -X POST http://localhost:9090/-/reload
+    echo "✅ Prometheus da duoc cap nhat (Reload) thanh cong!"
+else
+    echo "🎯 THONG TIN CAU HINH QUAN TRONG:"
+    echo "Khong tim thay thu muc $SCRAPE_DIR."
+    echo "Hay cap nhat file prometheus.yml cho cac targets sau:"
+    echo "  - PVE Exporter Port: ${PVE_PORT}"
+    echo "  - Node Exporter Port: ${NODE_PORT}"
+fi
