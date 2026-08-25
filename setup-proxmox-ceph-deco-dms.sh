@@ -16,9 +16,9 @@ echo "✅ Da tim thay Docker."
 check_port() {
     local port=$1
     if command -v ss &> /dev/null; then
-        ss -tuln | grep -q ":$port "
+        ss -tuln | awk '{print $5}' | grep -qE ":$port$"
     elif command -v netstat &> /dev/null; then
-        netstat -tuln | grep -q ":$port "
+        netstat -tuln | awk '{print $4}' | grep -qE ":$port$"
     else
         return 1
     fi
