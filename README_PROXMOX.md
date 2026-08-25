@@ -1,4 +1,4 @@
-# Proxmox - Ceph Prometheus KHACH HANG DECO - DMS-1787657409652
+# 🚀 Hệ Thống Giám Sát Proxmox & Ceph HA (Enterprise Edition)
 
 Hệ thống giám sát toàn diện cho cụm máy chủ Proxmox, bao gồm các thành phần:
 1. **Proxmox Metrics (PVE Exporter)**: Giám sát tài nguyên máy ảo (VM), LXC, Storage, Node.
@@ -126,7 +126,7 @@ Tất cả các biểu đồ chuyên sâu đã được đóng gói sẵn trong 
 1. Đăng nhập vào Grafana của bạn.
 2. Di chuột vào icon dấu `+` (Hoặc mục **Dashboards**) -> Chọn **Import**.
 3. Bấm **Upload JSON file** và chọn file:
-   `Proxmox - Ceph Prometheus KHACH HANG DECO - DMS-1787657409652.json`
+   `Grafana_Dashboard_Proxmox_Ceph_HA_Monitoring.json`
 4. Ở màn hình cấu hình, chọn đúng nguồn dữ liệu (Data Source) là kho `Prometheus` của bạn.
 5. Bấm **Import** và hoàn tất!
 
