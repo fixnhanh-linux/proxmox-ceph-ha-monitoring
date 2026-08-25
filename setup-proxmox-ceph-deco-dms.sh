@@ -29,6 +29,7 @@ default:
   token_name: monitor-grafana
   token_value: PLEASE_ENTER_YOUR_SECRET_TOKEN_HERE
   verify_ssl: false
+  api_host: 10.8.10.21 # <-- Nhập IP máy chủ Proxmox của bạn vào đây
 EOF
     echo "❌ Đã tạo file mẫu $CREDENTIALS_FILE."
     echo "VUI LÒNG: Mở file $CREDENTIALS_FILE, điền đúng 'token_value' của bạn rồi chạy lại script này!"
