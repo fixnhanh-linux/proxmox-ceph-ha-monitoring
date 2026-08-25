@@ -20,26 +20,30 @@ echo "✅ Đã tìm thấy Docker và Docker Compose."
 
 # 2. Kiểm tra file cấu hình credentials
 CREDENTIALS_FILE="proxmox_credentials.yml"
-if [ ! -f "$CREDENTIALS_FILE" ]; then
-    echo "⚠️ Không tìm thấy file $CREDENTIALS_FILE!"
-    echo "Đang tạo file mẫu $CREDENTIALS_FILE..."
+if [ ! -f "$CREDENTIALS_FILE" ] || grep -q "PLEASE_ENTER_YOUR_SECRET_TOKEN_HERE" "$CREDENTIALS_FILE"; then
+    echo "⚠️ Yêu cầu cấu hình thông tin kết nối Proxmox API:"
+    
+    read -p "🔹 Nhập IP máy chủ Proxmox (Ví dụ: 10.8.10.21): " PVE_IP
+    read -p "🔹 Nhập User name (Mặc định: root@pam): " PVE_USER
+    PVE_USER=$${PVE_USER:-root@pam}
+    read -p "🔹 Nhập Token Name (Ví dụ: monitor-grafana): " PVE_TOKEN_NAME
+    read -p "🔹 Nhập Token Value (Secret Key): " PVE_TOKEN_VALUE
+
+    if [ -z "$PVE_TOKEN_VALUE" ] || [ -z "$PVE_IP" ] || [ -z "$PVE_TOKEN_NAME" ]; then
+        echo "❌ Lỗi: Bạn không được để trống IP, Token Name hoặc Token Value!"
+        exit 1
+    fi
+
+    echo "Đang tạo file cấu hình $CREDENTIALS_FILE..."
     cat <<EOF > $CREDENTIALS_FILE
 default:
-  user: root@pam
-  token_name: monitor-grafana
-  token_value: PLEASE_ENTER_YOUR_SECRET_TOKEN_HERE
+  user: $PVE_USER
+  token_name: $PVE_TOKEN_NAME
+  token_value: $PVE_TOKEN_VALUE
   verify_ssl: false
-  api_host: 10.8.10.21 # <-- Nhập IP máy chủ Proxmox của bạn vào đây
+  api_host: $PVE_IP
 EOF
-    echo "❌ Đã tạo file mẫu $CREDENTIALS_FILE."
-    echo "VUI LÒNG: Mở file $CREDENTIALS_FILE, điền đúng 'token_value' của bạn rồi chạy lại script này!"
-    exit 1
-fi
-
-# Kiểm tra xem người dùng đã đổi token mẫu chưa
-if grep -q "PLEASE_ENTER_YOUR_SECRET_TOKEN_HERE" "$CREDENTIALS_FILE"; then
-    echo "❌ BẠN CHƯA ĐIỀN TOKEN! Vui lòng mở file $CREDENTIALS_FILE và cập nhật 'token_value' trước khi build hệ thống."
-    exit 1
+    echo "✅ Đã lưu cấu hình kết nối!"
 fi
 
 echo "✅ Đã tìm thấy cấu hình Token hợp lệ."

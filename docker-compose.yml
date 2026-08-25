@@ -8,9 +8,6 @@ services:
       - ./proxmox_credentials.yml:/etc/prometheus/pve.yml:ro
     ports:
       - "9224:9221"
-    networks:
-      default:
-        ipv4_address: 172.26.0.10
     restart: unless-stopped
 
   node-exporter:
@@ -22,9 +19,6 @@ services:
       - '--collector.textfile.directory=/etc/node-exporter'
     ports:
       - "9393:9100"
-    networks:
-      default:
-        ipv4_address: 172.26.0.20
     restart: unless-stopped
 
   ha-exporter:
@@ -85,15 +79,5 @@ services:
         done
     volumes:
       - ./metrics:/metrics
-      - ./pve-exporter/proxmox_credentials.yml:/config.yml:ro
-    networks:
-      default:
-        ipv4_address: 172.26.0.30
+      - ./proxmox_credentials.yml:/config.yml:ro
     restart: unless-stopped
-
-networks:
-  default:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.26.0.0/16
