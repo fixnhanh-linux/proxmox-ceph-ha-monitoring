@@ -58,14 +58,16 @@ NODE_PORT=9393
 
 echo "🔍 Dang kiem tra cong mang tren he thong..."
 while check_port $PVE_PORT; do
-    echo "⚠️ Cong $PVE_PORT (PVE Exporter) da bi chiem!"
-    read -p "🔹 Vui long nhap mot cong khac cho PVE Exporter (Vi du: 9225): " PVE_PORT
+    echo "⚠️ Cong $PVE_PORT (PVE Exporter) da bi chiem! Tu dong thu cong $((PVE_PORT+1))..."
+    PVE_PORT=$((PVE_PORT+1))
 done
+echo "✅ Da chon cong $PVE_PORT cho PVE Exporter."
 
 while check_port $NODE_PORT; do
-    echo "⚠️ Cong $NODE_PORT (Node Exporter) da bi chiem!"
-    read -p "🔹 Vui long nhap mot cong khac cho Node Exporter (Vi du: 9394): " NODE_PORT
+    echo "⚠️ Cong $NODE_PORT (Node Exporter) da bi chiem! Tu dong thu cong $((NODE_PORT+1))..."
+    NODE_PORT=$((NODE_PORT+1))
 done
+echo "✅ Da chon cong $NODE_PORT cho Node Exporter."
 
 # 3. Tao file credentials
 CREDENTIALS_FILE="proxmox_credentials.yml"
