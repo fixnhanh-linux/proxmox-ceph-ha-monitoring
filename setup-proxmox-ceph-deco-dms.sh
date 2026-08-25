@@ -135,10 +135,10 @@ services:
           if [ -n "\$\$CLUSTER_STATUS" ] && echo "\$\$CLUSTER_STATUS" | jq -e . >/dev/null 2>&1; then
             NODE_IPS=\$\$(echo "\$\$CLUSTER_STATUS" | jq -r '.data[]? | select(.type=="node" and .online==1) | .ip')
             if [ -n "\$\$NODE_IPS" ]; then
-              PVE_TARGETS=\$\$(echo "\$\$NODE_IPS" | jq -R . | jq -s '[{targets: .}]')
+              PVE_TARGETS=\$\$(echo "\$\$NODE_IPS" | jq -R . | jq -s '[{targets: ., labels: {job_type: "pve-metrics"}}]')
               echo "\$\$PVE_TARGETS" > /metrics/proxmox_targets.json.tmp
               mv /metrics/proxmox_targets.json.tmp /metrics/proxmox_targets.json
-              CEPH_TARGETS=\$\$(echo "\$\$NODE_IPS" | awk '{print \$\$1":9283"}' | jq -R . | jq -s '[{targets: .}]')
+              CEPH_TARGETS=\$\$(echo "\$\$NODE_IPS" | awk '{print \$\$1":9283"}' | jq -R . | jq -s '[{targets: ., labels: {job_type: "direct-metrics"}}]')
               echo "\$\$CEPH_TARGETS" > /metrics/ceph_targets.json.tmp
               mv /metrics/ceph_targets.json.tmp /metrics/ceph_targets.json
             fi
@@ -179,28 +179,36 @@ if [ -d "$SCRAPE_DIR" ]; then
     
     echo "📝 Dang tu dong tao cau hinh Prometheus tai $SCRAPE_FILE ..."
     cat <<EOF > "$SCRAPE_FILE"
-  - job_name: '${PROJECT_NAME}-proxmox'
-    metrics_path: /pve
+  - job_name: "Proxmox-Cluster-DMS"
     file_sd_configs:
       - files:
         - '${CURRENT_DIR}/metrics/proxmox_targets.json'
-    relabel_configs:
-      - source_labels: [__address__]
-        target_label: __param_target
-      - source_labels: [__param_target]
-        target_label: instance
-      - target_label: __address__
-        replacement: ${CURRENT_IP}:${PVE_PORT}
-
-  - job_name: '${PROJECT_NAME}-ceph'
-    file_sd_configs:
       - files:
         - '${CURRENT_DIR}/metrics/ceph_targets.json'
-
-  - job_name: '${PROJECT_NAME}-node_exporter_ha'
     static_configs:
       - targets:
         - '${CURRENT_IP}:${NODE_PORT}'
+        labels:
+          job_type: "direct-metrics"
+
+    relabel_configs:
+      - source_labels: [job_type]
+        regex: "pve-metrics"
+        target_label: __metrics_path__
+        replacement: "/pve"
+
+      - source_labels: [job_type, __address__]
+        regex: "pve-metrics;(.+)"
+        target_label: __param_target
+        replacement: "\${1}"
+
+      - source_labels: [__param_target]
+        target_label: instance
+
+      - source_labels: [job_type]
+        regex: "pve-metrics"
+        target_label: __address__
+        replacement: "${CURRENT_IP}:${PVE_PORT}"
 EOF
     echo "✅ Da tao xong file $SCRAPE_FILE!"
     
