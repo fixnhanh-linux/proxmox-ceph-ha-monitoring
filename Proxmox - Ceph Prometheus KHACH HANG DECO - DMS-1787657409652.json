@@ -1,0 +1,3317 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 911,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 9,
+      "panels": [],
+      "title": "Cluster State",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${Site}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "green",
+                  "text": "HEALTHY"
+                },
+                "1": {
+                  "color": "orange",
+                  "text": "WARNING"
+                },
+                "2": {
+                  "color": "red",
+                  "text": "ERROR"
+                }
+              },
+              "type": "value"
+            },
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "color": "gray",
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "orange",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 2
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 0,
+        "y": 1
+      },
+      "id": 26,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "(ceph_health_status{job=~\"$job\"})",
+          "format": "time_series",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Cluster Health Status",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${Site}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "center",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "inspect": false
+          },
+          "fieldMinMax": false,
+          "mappings": [
+            {
+              "options": {
+                "HEALTH_ERR": {
+                  "color": "red",
+                  "text": "CRITICAL"
+                },
+                "HEALTH_WARN": {
+                  "color": "orange",
+                  "text": "WARNING"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "LEVEL"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 110
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ERROR CODE"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 220
+              },
+              {
+                "id": "custom.align",
+                "value": "left"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 4,
+        "y": 1
+      },
+      "id": 27,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "enablePagination": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "max by (name, severity, message, job) (ceph_health_detail{job=~\"$job\"} > 0)",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Detailed Alarms",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Value": true
+            },
+            "includeByName": {},
+            "indexByName": {
+              "message": 2,
+              "name": 1,
+              "severity": 0
+            },
+            "renameByName": {
+              "message": "DETAILED MESSAGE",
+              "name": "ERROR CODE",
+              "severity": "LEVEL"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${Site}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "green",
+            "mode": "fixed"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "decbytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 8,
+        "y": 1
+      },
+      "id": 28,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "valueSize": 60
+        },
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "sum(ceph_cluster_total_bytes{job=~\"$job\"}) by (job)",
+          "instant": true,
+          "legendFormat": "Total Capacity",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Cluster Capacity",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${Site}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "orange",
+                "value": 750000000000000
+              },
+              {
+                "color": "red",
+                "value": 900000000000000
+              }
+            ]
+          },
+          "unit": "decbytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 12,
+        "y": 1
+      },
+      "id": 29,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "sum(ceph_cluster_total_used_bytes{job=~\"$job\"}) by (job)",
+          "instant": true,
+          "legendFormat": "Used",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Used Capacity",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${Site}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 0,
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "color": "green",
+                  "text": "0"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 16,
+        "y": 1
+      },
+      "id": 31,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "sum(ceph_pg_inconsistent{job=~\"$job\"}) or vector(0)",
+          "instant": true,
+          "legendFormat": "L\u1ed7i PG",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "PG Inconsistent",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${Site}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 2,
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "orange",
+                "value": 10
+              },
+              {
+                "color": "red",
+                "value": 50
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 20,
+        "y": 1
+      },
+      "id": 32,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "avg(ceph_osd_apply_latency_ms{job=~\"$job\"})",
+          "instant": true,
+          "legendFormat": "Apply Latency",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Avg Apply Latency",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 6
+      },
+      "id": 15,
+      "panels": [],
+      "title": "OSD State",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${Site}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "fieldMinMax": false,
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "index": 0,
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 0,
+        "y": 7
+      },
+      "id": 16,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "count(ceph_osd_up{job=~\"$job\"}) - count(ceph_osd_in{job=~\"$job\"})",
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "OSDs OUT",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${Site}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "fieldMinMax": false,
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "index": 0,
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "dark-green"
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 4,
+        "y": 7
+      },
+      "id": 17,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "count(ceph_osd_up{job=~\"$job\"} == 0) OR vector(0)",
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "OSDs DOWN",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${Site}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-GrYlRd"
+          },
+          "fieldMinMax": false,
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "index": 0,
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "dark-green"
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 8,
+        "y": 7
+      },
+      "id": 18,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "count by (job) (ceph_osd_up{job=~\"$job\"} == 1)",
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "OSDs UP",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${Site}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-GrYlRd"
+          },
+          "fieldMinMax": false,
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "index": 0,
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "dark-green"
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 12,
+        "y": 7
+      },
+      "id": 19,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "count by (job) (ceph_osd_in{job=~\"$job\"} == 1)",
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "OSDs IN",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${Site}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 2,
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "orange",
+                "value": 75
+              },
+              {
+                "color": "red",
+                "value": 85
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 16,
+        "y": 7
+      },
+      "id": 30,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 24,
+          "valueSize": 60
+        },
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "bottomk(1, (ceph_osd_stat_bytes_used{job=~\"$job\"} / ceph_osd_stat_bytes{job=~\"$job\"}) * 100)",
+          "instant": true,
+          "legendFormat": "{{ceph_daemon}}",
+          "refId": "A"
+        }
+      ],
+      "title": "OSD Low",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${Site}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 2,
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "orange",
+                "value": 75
+              },
+              {
+                "color": "red",
+                "value": 85
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 20,
+        "y": 7
+      },
+      "id": 21,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 24,
+          "valueSize": 60
+        },
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "topk(1, (ceph_osd_stat_bytes_used{job=~\"$job\"} / ceph_osd_stat_bytes{job=~\"$job\"}) * 100)",
+          "instant": true,
+          "legendFormat": "{{ceph_daemon}}",
+          "refId": "A"
+        }
+      ],
+      "title": "OSD High",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${Site}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "center",
+            "cellOptions": {
+              "type": "color-text"
+            },
+            "inspect": false
+          },
+          "decimals": 2,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "orange",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 85
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 12,
+        "x": 0,
+        "y": 12
+      },
+      "id": 24,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "topk(1, (max by (ceph_daemon, job) (ceph_osd_stat_bytes_used{job=~\"$job\"}) /  max by (ceph_daemon, job) (ceph_osd_stat_bytes{job=~\"$job\"})  * 100)* on(ceph_daemon) group_left  max by (ceph_daemon) (ceph_osd_metadata{device_class=\"nvme\", job=~\"$job\"}))",
+          "format": "table",
+          "instant": true,
+          "refId": "High"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "bottomk(1, \r\n  (\r\n    max by (ceph_daemon, job) (ceph_osd_stat_bytes_used{job=~\"$job\"}) \r\n    / \r\n    max by (ceph_daemon, job) (ceph_osd_stat_bytes{job=~\"$job\"}) \r\n    * 100\r\n  )\r\n  * on(ceph_daemon) group_left \r\n  max by (ceph_daemon) (ceph_osd_metadata{device_class=\"nvme\", job=~\"$job\"})\r\n)",
+          "format": "table",
+          "instant": true,
+          "refId": "Low"
+        }
+      ],
+      "title": "OSD Used Class Nvme",
+      "transformations": [
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "ceph_daemon",
+            "mode": "outer"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "job": true
+            },
+            "includeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "Value #High": "High",
+              "Value #Low": "Low",
+              "ceph_daemon": "OSD"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${Site}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "center",
+            "cellOptions": {
+              "type": "color-text"
+            },
+            "inspect": false
+          },
+          "decimals": 2,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "orange",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 85
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 12,
+        "x": 12,
+        "y": 12
+      },
+      "id": 23,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "topk(1, \r\n  (\r\n    max by (ceph_daemon, job) (ceph_osd_stat_bytes_used{job=~\"$job\"}) \r\n    / \r\n    max by (ceph_daemon, job) (ceph_osd_stat_bytes{job=~\"$job\"}) \r\n    * 100\r\n  )\r\n  * on(ceph_daemon) group_left \r\n  max by (ceph_daemon) (ceph_osd_metadata{device_class=\"ssd\", job=~\"$job\"})\r\n)",
+          "format": "table",
+          "instant": true,
+          "refId": "High"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "bottomk(1, \r\n  (\r\n    max by (ceph_daemon, job) (ceph_osd_stat_bytes_used{job=~\"$job\"}) \r\n    / \r\n    max by (ceph_daemon, job) (ceph_osd_stat_bytes{job=~\"$job\"}) \r\n    * 100\r\n  )\r\n  * on(ceph_daemon) group_left \r\n  max by (ceph_daemon) (ceph_osd_metadata{device_class=\"ssd\", job=~\"$job\"})\r\n)",
+          "format": "table",
+          "instant": true,
+          "refId": "Low"
+        }
+      ],
+      "title": "OSD Used Class SSD",
+      "transformations": [
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "ceph_daemon",
+            "mode": "outer"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "job 1": true,
+              "job 2": true
+            },
+            "includeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "Value #High": "High",
+              "Value #Low": "Low",
+              "ceph_daemon": "OSD"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${Site}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "center",
+            "cellOptions": {
+              "type": "color-text"
+            },
+            "inspect": false
+          },
+          "decimals": 2,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "orange",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 85
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 12,
+        "x": 0,
+        "y": 17
+      },
+      "id": 25,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "topk(1, \r\n  (\r\n    max by (ceph_daemon, job) (ceph_osd_stat_bytes_used{job=~\"$job\"}) \r\n    / \r\n    max by (ceph_daemon, job) (ceph_osd_stat_bytes{job=~\"$job\"}) \r\n    * 100\r\n  )\r\n  * on(ceph_daemon) group_left \r\n  max by (ceph_daemon) (ceph_osd_metadata{device_class=\"hdd\", job=~\"$job\"})\r\n)",
+          "format": "table",
+          "instant": true,
+          "refId": "High"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "bottomk(1, \r\n  (\r\n    max by (ceph_daemon, job) (ceph_osd_stat_bytes_used{job=~\"$job\"}) \r\n    / \r\n    max by (ceph_daemon, job) (ceph_osd_stat_bytes{job=~\"$job\"}) \r\n    * 100\r\n  )\r\n  * on(ceph_daemon) group_left \r\n  max by (ceph_daemon) (ceph_osd_metadata{device_class=\"hdd\", job=~\"$job\"})\r\n)",
+          "format": "table",
+          "instant": true,
+          "refId": "Low"
+        }
+      ],
+      "title": "OSD Used Class HDD",
+      "transformations": [
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "ceph_daemon",
+            "mode": "outer"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Time 1": true,
+              "Value #Low": false,
+              "job 1": true,
+              "job 2": true
+            },
+            "includeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "Time 1": "",
+              "Value #High": "High",
+              "Value #Low": "Low",
+              "ceph_daemon": "OSD",
+              "job 1": "SITE",
+              "job 2": "SITE"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${Site}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "center",
+            "cellOptions": {
+              "type": "color-text"
+            },
+            "inspect": false
+          },
+          "decimals": 2,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "orange",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 85
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 12,
+        "x": 12,
+        "y": 17
+      },
+      "id": 22,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "topk(1, (max by (ceph_daemon) (ceph_osd_stat_bytes_used{job=~\"$job\"}) / max by (ceph_daemon) (ceph_osd_stat_bytes{job=~\"$job\"}) * 100) * on(ceph_daemon) group_left max by (ceph_daemon) (ceph_osd_metadata{device_class=\"hdd12t\", job=~\"$job\"}))",
+          "format": "table",
+          "instant": true,
+          "refId": "High"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "expr": "bottomk(1, (max by (ceph_daemon) (ceph_osd_stat_bytes_used{job=~\"$job\"}) / max by (ceph_daemon) (ceph_osd_stat_bytes{job=~\"$job\"}) * 100) * on(ceph_daemon) group_left max by (ceph_daemon) (ceph_osd_metadata{device_class=\"hdd\", job=~\"$job\"}))",
+          "format": "table",
+          "instant": true,
+          "refId": "Low"
+        }
+      ],
+      "title": "OSD Used Class HDD12T",
+      "transformations": [
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "ceph_daemon",
+            "mode": "outer"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "includeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "Time 2": "",
+              "Value #High": "High",
+              "Value #Low": "Low",
+              "ceph_daemon": "OSD"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 22
+      },
+      "id": 2,
+      "panels": [],
+      "title": "Proxmox Resource - HA Group",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${Site}"
+      },
+      "description": "Hi\u1ec3n th\u1ecb th\u00f4ng tin t\u00e0i nguy\u00ean cluster k\u00e8m theo HA Groups",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "center",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "inspect": false
+          },
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "color": "text",
+                  "text": "-"
+                }
+              },
+              "type": "special"
+            },
+            {
+              "options": {
+                "error": {
+                  "color": "red",
+                  "index": 3,
+                  "text": "Error"
+                },
+                "fence": {
+                  "color": "red",
+                  "index": 2,
+                  "text": "Fence"
+                },
+                "maintenance": {
+                  "color": "orange",
+                  "index": 1,
+                  "text": "Maintenance"
+                },
+                "online": {
+                  "color": "green",
+                  "index": 0,
+                  "text": "Online"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 85
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "T\u1ed5ng RAM"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "UPTIME"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "dtdhms"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "HA"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "0": {
+                        "color": "red",
+                        "index": 1,
+                        "text": "-"
+                      },
+                      "1": {
+                        "color": "green",
+                        "index": 0,
+                        "text": "Online"
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "HA Groups"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "HA Groups"
+              },
+              {
+                "id": "custom.width",
+                "value": 200
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "BASIC-COMPUTING,INTEL-HIGH-CPU,P1-XD": {
+                        "color": "purple",
+                        "index": 0,
+                        "text": "BASIC+INTEL+P1-XD"
+                      },
+                      "Gold-6146,HIGH-FREQUENCY,P1-XD": {
+                        "color": "orange",
+                        "index": 1,
+                        "text": "Gold+HIGH+P1-XD"
+                      },
+                      "Gold-8260,INTEL-HIGH-CPU,P1-XD,Platinum-8260": {
+                        "color": "green",
+                        "index": 3,
+                        "text": "Gold+INTEL+P1+Platinum"
+                      },
+                      "Gold-8260,INTEL-HIGH-CPU,Platinum-8260": {
+                        "color": "blue",
+                        "index": 2,
+                        "text": "Gold+INTEL+Platinum"
+                      },
+                      "null": {
+                        "color": "gray",
+                        "index": 4,
+                        "text": "No Group"
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 34,
+        "w": 24,
+        "x": 0,
+        "y": 23
+      },
+      "id": 10,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "enablePagination": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "expr": "label_replace(pve_cpu_usage_ratio{job=~\"$job\", id=~\"node/.*\"} * 100, \"host\", \"$1\", \"id\", \"node/(.*)\")",
+          "format": "table",
+          "instant": true,
+          "refId": "CPU"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "label_replace((pve_memory_usage_bytes{job=~\"$job\", id=~\"node/.*\"} / pve_memory_size_bytes{job=~\"$job\", id=~\"node/.*\"}) * 100, \"host\", \"$1\", \"id\", \"node/(.*)\")",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "__auto",
+          "refId": "RAM_Pct"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "label_replace(pve_memory_size_bytes{job=~\"$job\", id=~\"node/.*\"}, \"host\", \"$1\", \"id\", \"node/(.*)\")",
+          "format": "table",
+          "instant": true,
+          "refId": "RAM_Total"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "expr": "label_replace(pve_uptime_seconds{job=~\"$job\", id=~\"node/.*\"}, \"host\", \"$1\", \"id\", \"node/(.*)\")",
+          "format": "table",
+          "instant": true,
+          "refId": "Uptime"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "expr": "label_replace(pve_ha_state{job=~\"$job\", state=\"online\", id=~\"node/.*\"}, \"host\", \"$1\", \"id\", \"node/(.*)\")",
+          "format": "table",
+          "instant": true,
+          "refId": "HA"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "expr": "pve_ha_groups_custom_info{job=~\"$job\"}",
+          "format": "table",
+          "instant": true,
+          "refId": "Group"
+        }
+      ],
+      "title": "Resource Cluster with HA Groups",
+      "transformations": [
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "host",
+            "mode": "outer"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Time 1": true,
+              "Time 2": true,
+              "Time 3": true,
+              "Time 4": true,
+              "Time 5": true,
+              "Time 6": true,
+              "Value #Group": true,
+              "__name__": true,
+              "group": true,
+              "id": true,
+              "instance": true,
+              "job": true,
+              "job_type": true,
+              "state": true
+            },
+            "indexByName": {
+              "Value #CPU": 3,
+              "Value #HA": 2,
+              "Value #RAM_Pct": 4,
+              "Value #RAM_Total": 5,
+              "Value #Uptime": 6,
+              "groups": 1,
+              "host": 0
+            },
+            "renameByName": {
+              "Value #CPU": "CPU (%)",
+              "Value #HA": "HA",
+              "Value #RAM_Pct": "RAM (%)",
+              "Value #RAM_Total": "T\u1ed5ng RAM",
+              "Value #Uptime": "UPTIME",
+              "groups": "HA Groups",
+              "host": "Node Proxmox"
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": [
+              "Node Proxmox"
+            ],
+            "sort": [
+              "asc"
+            ]
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${Site}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "center",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "decimals": 2,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "#EAB839",
+                "value": 75
+              },
+              {
+                "color": "red",
+                "value": 85
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "% RAW USED"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 100
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 24,
+        "x": 0,
+        "y": 57
+      },
+      "id": 41,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": [
+            "Value #S",
+            "Value #A",
+            "Value #U",
+            "Value #R",
+            "Value #B"
+          ],
+          "reducer": [
+            "sum"
+          ],
+          "show": true
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "(ceph_cluster_by_class_total_bytes{job=~\"$job\"})",
+          "format": "table",
+          "instant": true,
+          "refId": "S"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "sum by (device_class) (ceph_cluster_by_class_total_bytes{job=~\"$job\"}) \r\n- \r\nsum by (device_class) (ceph_cluster_by_class_total_used_bytes{job=~\"$job\"})",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "(ceph_cluster_by_class_total_used_bytes{job=~\"$job\"})",
+          "format": "table",
+          "instant": true,
+          "refId": "U"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "(ceph_cluster_by_class_total_used_bytes{job=~\"$job\"})",
+          "format": "table",
+          "instant": true,
+          "refId": "R"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "(\r\n  sum by (device_class, job) (ceph_cluster_by_class_total_used_bytes{job=~\"$job\"}) \r\n  / \r\n  sum by (device_class, job) (ceph_cluster_by_class_total_bytes{job=~\"$job\"})\r\n) * 100",
+          "format": "table",
+          "instant": true,
+          "refId": "B"
+        }
+      ],
+      "title": "OSD CLASS DETAILS (HDD/SSD/NVME)",
+      "transformations": [
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "device_class",
+            "mode": "outer"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Time 1": true,
+              "Time 2": true,
+              "Time 3": true,
+              "Time 4": true,
+              "Time 5": true,
+              "__name__": true,
+              "__name__ 1": true,
+              "__name__ 2": true,
+              "__name__ 3": true,
+              "__name__ 4": true,
+              "instance": true,
+              "instance 1": true,
+              "instance 2": true,
+              "instance 3": true,
+              "instance 4": true,
+              "job": true,
+              "job 1": true,
+              "job 2": true,
+              "job 3": true,
+              "job 4": true,
+              "job_type 1": true,
+              "job_type 2": true,
+              "job_type 3": true
+            },
+            "includeByName": {},
+            "indexByName": {
+              "Value #A": 2,
+              "Value #B": 5,
+              "Value #R": 4,
+              "Value #S": 1,
+              "Value #U": 3,
+              "device_class": 0
+            },
+            "renameByName": {
+              "Value #A": "AVAIL",
+              "Value #B": "% RAW USED",
+              "Value #R": "RAW USED",
+              "Value #S": "SIZE",
+              "Value #U": "% USED",
+              "device_class": "CLASS"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${Site}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "center",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "%USED"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/STORED|DATA|OMAP|^USED|MAX AVAIL|QUOTA BYTES|COMPR/"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/PGS|OBJECTS|QUOTA OBJECTS|DIRTY/"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "short"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/QUOTA|DIRTY/"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "0": {
+                        "text": "N/A"
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 33,
+        "w": 24,
+        "x": 0,
+        "y": 68
+      },
+      "id": 42,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "%USED"
+          }
+        ]
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "(ceph_pool_metadata{job=~\"$job\"})",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "(ceph_pg_total{job=~\"$job\"})",
+          "format": "table",
+          "hide": false,
+          "instant": true,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "(ceph_pool_stored{job=~\"$job\"})",
+          "format": "table",
+          "hide": false,
+          "instant": true,
+          "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "(ceph_pool_stored{job=~\"$job\"})",
+          "format": "table",
+          "hide": false,
+          "instant": true,
+          "refId": "E"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "expr": "0",
+          "format": "table",
+          "hide": false,
+          "instant": true,
+          "refId": "F"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "(ceph_pool_objects{job=~\"$job\"})",
+          "format": "table",
+          "instant": true,
+          "refId": "G"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "(ceph_pool_bytes_used{job=~\"$job\"})",
+          "format": "table",
+          "hide": false,
+          "instant": true,
+          "refId": "H"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "(ceph_pool_bytes_used{job=~\"$job\"})",
+          "format": "table",
+          "hide": false,
+          "instant": true,
+          "refId": "I"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "expr": "0",
+          "format": "table",
+          "hide": false,
+          "instant": true,
+          "refId": "J"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "(ceph_pool_percent_used{job=~\"$job\"})",
+          "format": "table",
+          "instant": true,
+          "refId": "K"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "(ceph_pool_max_avail{job=~\"$job\"})",
+          "format": "table",
+          "instant": true,
+          "refId": "L"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "(ceph_pool_quota_objects{job=~\"$job\"})",
+          "format": "table",
+          "instant": true,
+          "refId": "M"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "(ceph_pool_quota_bytes{job=~\"$job\"})",
+          "format": "table",
+          "instant": true,
+          "refId": "N"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "(ceph_pool_dirty{job=~\"$job\"})",
+          "format": "table",
+          "instant": true,
+          "refId": "O"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "(ceph_pool_compress_bytes_used{job=~\"$job\"})",
+          "format": "table",
+          "instant": true,
+          "refId": "P"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "(ceph_pool_compress_under_bytes{job=~\"$job\"})",
+          "format": "table",
+          "instant": true,
+          "refId": "Q"
+        }
+      ],
+      "title": "CEPH POOL DETAILS ",
+      "transformations": [
+        {
+          "id": "seriesToColumns",
+          "options": {
+            "byField": "pool_id"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Time 1": true,
+              "Time 10": true,
+              "Time 11": true,
+              "Time 12": true,
+              "Time 13": true,
+              "Time 14": true,
+              "Time 2": true,
+              "Time 3": true,
+              "Time 4": true,
+              "Time 5": true,
+              "Time 6": true,
+              "Time 7": true,
+              "Time 8": true,
+              "Time 9": true,
+              "Value #A": true,
+              "Value #M": true,
+              "Value #N": true,
+              "Value #O": true,
+              "Value #P": true,
+              "Value #Q": false,
+              "__name__ 1": true,
+              "__name__ 10": true,
+              "__name__ 11": true,
+              "__name__ 12": true,
+              "__name__ 13": true,
+              "__name__ 14": true,
+              "__name__ 2": true,
+              "__name__ 3": true,
+              "__name__ 4": true,
+              "__name__ 5": true,
+              "__name__ 6": true,
+              "__name__ 7": true,
+              "__name__ 8": true,
+              "__name__ 9": true,
+              "compression_mode": true,
+              "description": true,
+              "instance": true,
+              "instance 10": true,
+              "instance 11": true,
+              "instance 12": true,
+              "instance 13": true,
+              "instance 14": true,
+              "instance 2": true,
+              "instance 3": true,
+              "instance 4": true,
+              "instance 5": true,
+              "instance 6": true,
+              "instance 7": true,
+              "instance 8": true,
+              "instance 9": true,
+              "job": true,
+              "job 1": true,
+              "job 10": true,
+              "job 11": true,
+              "job 12": true,
+              "job 13": true,
+              "job 14": true,
+              "job 2": true,
+              "job 3": true,
+              "job 4": true,
+              "job 5": true,
+              "job 6": true,
+              "job 7": true,
+              "job 8": true,
+              "job 9": true,
+              "job_type 1": true,
+              "job_type 10": true,
+              "job_type 11": true,
+              "job_type 12": true,
+              "job_type 13": true,
+              "job_type 14": true,
+              "job_type 2": true,
+              "job_type 3": true,
+              "job_type 4": true,
+              "job_type 5": true,
+              "job_type 6": true,
+              "job_type 7": true,
+              "job_type 8": true,
+              "job_type 9": true,
+              "type": true
+            },
+            "includeByName": {},
+            "indexByName": {
+              "Value #C": 2,
+              "Value #D": 3,
+              "Value #E": 4,
+              "Value #F": 5,
+              "Value #G": 6,
+              "Value #H": 7,
+              "Value #I": 8,
+              "Value #J": 9,
+              "Value #K": 10,
+              "Value #L": 11,
+              "Value #M": 12,
+              "Value #N": 13,
+              "Value #O": 14,
+              "Value #P": 15,
+              "Value #Q": 16,
+              "name": 0,
+              "pool_id": 1
+            },
+            "renameByName": {
+              "Value #C": "PGS",
+              "Value #D": "STORED",
+              "Value #E": "(DATA)",
+              "Value #F": "(OMAP)",
+              "Value #G": "OBJECTS",
+              "Value #H": "USED",
+              "Value #I": "(DATA)",
+              "Value #J": "(OMAP)",
+              "Value #K": "%USED",
+              "Value #L": "MAX AVAIL",
+              "Value #M": "QUOTA OBJECTS",
+              "Value #N": "QUOTA BYTES",
+              "Value #O": "DIRTY",
+              "Value #P": "USED COMPR",
+              "Value #Q": "UNDER COMPR",
+              "name": "POOL",
+              "pool_id": "ID"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 101
+      },
+      "id": 8,
+      "panels": [],
+      "title": "Latency Top 5 High",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${Site}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 24,
+        "x": 0,
+        "y": 102
+      },
+      "id": 38,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true,
+          "sortBy": "Name",
+          "sortDesc": false
+        },
+        "tooltip": {
+          "maxHeight": 600,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "ceph_osd_apply_latency_ms{job=~\"$job\"}",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "{{ceph_daemon}}",
+          "range": true,
+          "refId": "D"
+        }
+      ],
+      "title": "OSD Apply Latency",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${Site}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "center",
+            "cellOptions": {
+              "type": "color-text"
+            },
+            "filterable": true,
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "orange",
+                "value": 20
+              },
+              {
+                "color": "red",
+                "value": 50
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 0,
+        "y": 114
+      },
+      "id": 11,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "topk(5, \r\n  avg by (ceph_daemon, hostname) (\r\n    ceph_osd_apply_latency_ms{job=~\"$job\"} \r\n    * on(ceph_daemon) group_left(hostname) \r\n    (max by (ceph_daemon, hostname) (ceph_osd_metadata{device_class=\"nvme\", job=~\"$job\"}))\r\n  )\r\n)",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Top 5 NVME High Latency",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "includeByName": {},
+            "indexByName": {
+              "Value": 2,
+              "ceph_daemon": 1,
+              "hostname": 0
+            },
+            "renameByName": {
+              "Value": "NVME (ms)",
+              "ceph_daemon": "OSD ID",
+              "hostname": "NODE"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${Site}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "center",
+            "cellOptions": {
+              "type": "color-text"
+            },
+            "filterable": true,
+            "inspect": false
+          },
+          "decimals": 0,
+          "fieldMinMax": false,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "orange",
+                "value": 20
+              },
+              {
+                "color": "red",
+                "value": 50
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "OSD ID"
+            },
+            "properties": [
+              {
+                "id": "custom.width"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 12,
+        "y": 114
+      },
+      "id": 12,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "topk(5, \r\n  ceph_osd_apply_latency_ms{job=~\"$job\"} \r\n  * on(ceph_daemon) group_left(hostname) \r\n  (max by (ceph_daemon, hostname) (ceph_osd_metadata{device_class=\"ssd\", job=~\"$job\"}))\r\n)",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Top 5 SSD High Latency",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Value": false,
+              "instance": true,
+              "job": true,
+              "job_type": true
+            },
+            "includeByName": {},
+            "indexByName": {
+              "Time": 3,
+              "Value": 2,
+              "ceph_daemon": 1,
+              "hostname": 0,
+              "instance": 5,
+              "job": 4
+            },
+            "renameByName": {
+              "Value": "Latency (ms)",
+              "ceph_daemon": "OSD ID",
+              "hostname": "NODE"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${Site}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "center",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "orange",
+                "value": 20
+              },
+              {
+                "color": "red",
+                "value": 50
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 0,
+        "y": 121
+      },
+      "id": 13,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "topk(5, avg by (ceph_daemon, hostname) (ceph_osd_apply_latency_ms{job=~\"$job\"} * on(ceph_daemon) group_left(hostname) (avg by (ceph_daemon, hostname) (ceph_osd_metadata{device_class=\"hdd\", job=~\"$job\"}))))",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "title": "TOP 5 HDD High Latency",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "includeByName": {},
+            "indexByName": {
+              "Value": 2,
+              "ceph_daemon": 1,
+              "hostname": 0
+            },
+            "renameByName": {
+              "Value": "HDD (ms)",
+              "ceph_daemon": "OSD ID",
+              "hostname": "NODE"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${Site}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "center",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "orange",
+                "value": 20
+              },
+              {
+                "color": "red",
+                "value": 50
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 12,
+        "y": 121
+      },
+      "id": 14,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "topk(5, avg by (ceph_daemon, hostname) (ceph_osd_apply_latency_ms{job=~\"$job\"} * on(ceph_daemon) group_left(hostname) (avg by (ceph_daemon, hostname) (ceph_osd_metadata{device_class=\"hdd12t\", job=~\"$job\"}))))",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Top 5 HDD12T High Latency",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "includeByName": {},
+            "indexByName": {
+              "Value": 2,
+              "ceph_daemon": 1,
+              "hostname": 0
+            },
+            "renameByName": {
+              "Value": "HDD12T (ms)",
+              "ceph_daemon": "OSD ID",
+              "hostname": "NODE"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 128
+      },
+      "id": 33,
+      "panels": [],
+      "title": "Ceph Recovery & Rebalance Operations",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${Site}"
+      },
+      "description": "Hi\u1ec3n th\u1ecb d\u00f2ng tr\u1ea1ng th\u00e1i gi\u1ed1ng giao di\u1ec7n Proxmox (Ch\u1ec9 hi\u1ec7n tr\u1ea1ng th\u00e1i m\u1edbi nh\u1ea5t)",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "displayName": "${__field.labels.content}",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 24,
+        "x": 0,
+        "y": 129
+      },
+      "id": 34,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "limit": 1,
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "name",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "ceph_custom_recovery_info{job=~\"$job\"}",
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Ceph Status",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${Site}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 90,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red"
+              },
+              {
+                "color": "#EAB839",
+                "value": 95
+              },
+              {
+                "color": "green",
+                "value": 99.9
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 5,
+        "x": 0,
+        "y": 132
+      },
+      "id": 35,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "ceph_custom_recovery_percent{job=~\"$job\"}",
+          "instant": false,
+          "legendFormat": "Health",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Total Health (%)",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${Site}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              }
+            ]
+          },
+          "unit": "binBps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 19,
+        "x": 5,
+        "y": 132
+      },
+      "id": 36,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "maxHeight": 600,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "10.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${Site}"
+          },
+          "editorMode": "code",
+          "expr": "ceph_custom_recovery_speed_bytes{job=~\"$job\"}",
+          "instant": false,
+          "legendFormat": "Recovery Speed",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Recovery Speed (T\u1ed1c \u0111\u1ed9 ph\u1ee5c h\u1ed3i)",
+      "type": "timeseries"
+    }
+  ],
+  "preload": false,
+  "refresh": "30s",
+  "schemaVersion": 41,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": "Prometheus FPT HCM",
+          "value": "mq7JSiz4k"
+        },
+        "includeAll": false,
+        "label": "Site",
+        "name": "Site",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "Prometheus FPT HCM",
+        "type": "datasource"
+      },
+      {
+        "current": {
+          "text": "Proxmox-Cluster-Deco",
+          "value": "Proxmox-Cluster-Deco"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${Site}"
+        },
+        "definition": "label_values(up, job)",
+        "includeAll": true,
+        "label": "Job / Cluster",
+        "name": "job",
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values(up, job)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "/^(proxmox|ceph|node_exporter_ha)$/",
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-5m",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "Asia/Ho_Chi_Minh",
+  "title": "Proxmox - Ceph Prometheus KHACH HANG DECO - DMS",
+  "uid": "advggjv",
+  "version": 5
+}

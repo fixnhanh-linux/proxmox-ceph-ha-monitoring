@@ -1,0 +1,75 @@
+version: "3.9"
+
+services:
+  pve-exporter:
+    image: prompve/prometheus-pve-exporter:latest
+    container_name: pve-exporter-dms
+    volumes:
+      - ./proxmox_credentials.yml:/etc/prometheus/pve.yml:ro
+    ports:
+      - "9224:9221"
+    networks:
+      default:
+        ipv4_address: 172.26.0.10
+    restart: unless-stopped
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter-dms
+    volumes:
+      - ./metrics:/etc/node-exporter:ro
+    command:
+      - '--collector.textfile.directory=/etc/node-exporter'
+    ports:
+      - "9393:9100"
+    networks:
+      default:
+        ipv4_address: 172.26.0.20
+    restart: unless-stopped
+
+  ha-exporter:
+    image: alpine:latest
+    container_name: ha-exporter-dms
+    command:
+      - /bin/sh
+      - -c
+      - |
+        apk add --no-cache curl jq bash
+        # Tự động đọc cấu hình token từ file chung
+        USER_VAL=$$(awk '/user:/ {print $$2}' /config.yml | tr -d '\r')
+        NAME_VAL=$$(awk '/token_name:/ {print $$2}' /config.yml | tr -d '\r')
+        TOKEN_VAL=$$(awk '/token_value:/ {print $$2}' /config.yml | tr -d '\r')
+        PVE_API_TOKEN="$$USER_VAL!$$NAME_VAL=$$TOKEN_VAL"
+
+        while true; do
+          JSON_DATA=$$(curl -s -k -H "Authorization: PVEAPIToken=$$PVE_API_TOKEN" "https://172.18.20.21:8006/api2/json/cluster/ha/groups")
+          if [ -n "$$JSON_DATA" ]; then
+            DATA_SPLIT=$$(echo "$$JSON_DATA" | jq -r '.data[]? | .group as $$g | .nodes | split(",")[]? | "pve_ha_group_custom_info{group=\"\($$g)\",host=\"\(.)\"} 1"')
+            DATA_MERGED=$$(echo "$$JSON_DATA" | jq -r '.data[]? | "pve_ha_group_custom_info_merged{group=\"" + .group + "\",nodes=\"" + .nodes + "\"} 1"')
+            
+            echo "# HELP pve_ha_group_custom_info HA group info split by host" > /metrics/pve_ha.prom.tmp
+            echo "# TYPE pve_ha_group_custom_info gauge" >> /metrics/pve_ha.prom.tmp
+            echo "$$DATA_SPLIT" >> /metrics/pve_ha.prom.tmp
+            
+            echo "# HELP pve_ha_group_custom_info_merged HA group info with all nodes" >> /metrics/pve_ha.prom.tmp
+            echo "# TYPE pve_ha_group_custom_info_merged gauge" >> /metrics/pve_ha.prom.tmp
+            echo "$$DATA_MERGED" >> /metrics/pve_ha.prom.tmp
+            
+            mv /metrics/pve_ha.prom.tmp /metrics/pve_ha.prom
+          fi
+          sleep 15
+        done
+    volumes:
+      - ./metrics:/metrics
+      - ./pve-exporter/proxmox_credentials.yml:/config.yml:ro
+    networks:
+      default:
+        ipv4_address: 172.26.0.30
+    restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.26.0.0/16

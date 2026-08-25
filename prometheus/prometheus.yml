@@ -1,0 +1,36 @@
+scrape_configs:
+  # ====================================================================
+  # 1. Job thu thập thông tin Máy ảo, Node, Storage (Qua PVE Exporter)
+  # ====================================================================
+  - job_name: 'proxmox'
+    metrics_path: /pve
+    static_configs:
+      - targets:
+        - '10.8.10.21'           # IP của Node Proxmox 1 cần lấy số liệu
+        - '10.8.10.22'           # IP của Node Proxmox 2 (nếu có, cứ liệt kê thêm)
+        - '10.8.10.23'           # IP của Node Proxmox 3
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: 10.8.10.201:9224 # <-- Đổi thành IP của máy chạy docker-compose PVE Exporter
+
+  # ====================================================================
+  # 2. Job thu thập thông tin lưu trữ phân tán Ceph
+  # ====================================================================
+  - job_name: 'ceph'
+    static_configs:
+      - targets:
+        - '10.8.10.21:9283'      # Node Proxmox 1 (Kèm port 9283 của module Ceph MGR)
+        - '10.8.10.22:9283'      # Node Proxmox 2
+        - '10.8.10.23:9283'      # Node Proxmox 3
+
+  # ====================================================================
+  # 3. Job thu thập thông tin High Availability (HA)
+  # ====================================================================
+  - job_name: 'node_exporter_ha'
+    static_configs:
+      - targets:
+        - '10.8.10.201:9393'     # <-- Đổi thành IP của máy chạy docker-compose node-exporter
