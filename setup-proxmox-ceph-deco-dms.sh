@@ -91,6 +91,7 @@ services:
     container_name: ${PROJECT_NAME}-pve-exporter
     volumes:
       - ./proxmox_credentials.yml:/etc/prometheus/pve.yml:ro
+      - ./proxmox_credentials.yml:/etc/proxmox.yml:ro
     ports:
       - "${PVE_PORT}:9221"
     restart: unless-stopped

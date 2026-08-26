@@ -166,3 +166,118 @@ Nếu bạn vẫn không biết mình viết sai ở đâu, hãy dùng tính nă
 5. Hãy copy chính xác cụm label đó nhét ngược lại vào câu lệnh Query của cái biểu đồ đang bị lỗi. Chắc chắn 100% biểu đồ sẽ lên hình!
 
 *Đừng quên bấm icon **Save** (biểu tượng đĩa mềm) ở góc trên Dashboard sau khi đã sửa xong tất cả để lưu lại vĩnh viễn cấu hình này nhé!*
+
+---
+
+## 7. Sơ Đồ Kiến Trúc Hệ Thống (Architecture Diagram)
+
+Dưới đây là sơ đồ chi tiết về luồng hoạt động và cách các thành phần trong hệ thống giám sát tương tác với nhau:
+
+```mermaid
+graph TD
+    %% Định nghĩa các cụm
+    subgraph Proxmox_Cluster [Cụm Máy Chủ Proxmox & Ceph]
+        direction TB
+        subgraph PVE_Nodes [Các Máy Chủ Vật Lý]
+            PVE1[Node 1: PVE, VM, LXC]
+            PVE2[Node 2: PVE, VM, LXC]
+            PVE3[Node 3: PVE, VM, LXC]
+        end
+        
+        subgraph Ceph_Storage [Lưu trữ Ceph Tích Hợp]
+            MGR[Ceph MGR / Prometheus Module<br/>Port 9283]
+            OSD[Ceph OSDs]
+            MON[Ceph MONs]
+            MGR --- OSD
+            MGR --- MON
+        end
+        PVE_Nodes -.- Ceph_Storage
+    end
+
+    subgraph Monitoring_Server [Máy Chủ Giám Sát Trung Tâm]
+        direction TB
+        subgraph Docker_Compose [Docker Compose Environment]
+            PVE_Exp[pve-exporter<br/>Port: 9224]
+            HA_Exp[ha-exporter<br/>Script thu thập HA]
+            Node_Exp[node-exporter<br/>Port: 9393]
+            
+            Metrics_Dir[(Thư mục chia sẻ<br/>./metrics)]
+            
+            Prometheus[Prometheus Server<br/>Lưu trữ Metrics]
+            Grafana[Grafana<br/>Hiển thị Dashboard]
+        end
+    end
+
+    %% Luồng thu thập dữ liệu (Data Flow)
+    PVE_Exp --"1. Gọi API (Dùng Token)"--> PVE_Nodes
+    HA_Exp --"2. Gọi API kiểm tra HA"--> PVE_Nodes
+    
+    HA_Exp --"Ghi kết quả (.prom)"--> Metrics_Dir
+    Node_Exp --"Đọc dữ liệu Textfile"--> Metrics_Dir
+    
+    Prometheus --"Scrape /pve"--> PVE_Exp
+    Prometheus --"Scrape /metrics"--> Node_Exp
+    Prometheus --"Scrape Ceph Metrics"--> MGR
+    
+    Grafana --"Truy vấn dữ liệu (PromQL)"--> Prometheus
+
+    %% Style cho đẹp
+    classDef proxmox fill:#e57373,stroke:#c62828,stroke-width:2px,color:#fff;
+    classDef ceph fill:#ffb74d,stroke:#ef6c00,stroke-width:2px,color:#fff;
+    classDef exporter fill:#81c784,stroke:#2e7d32,stroke-width:2px,color:#fff;
+    classDef core fill:#64b5f6,stroke:#1565c0,stroke-width:2px,color:#fff;
+    classDef storage fill:#90a4ae,stroke:#455a64,stroke-width:2px,color:#fff;
+
+    class PVE1,PVE2,PVE3 proxmox;
+    class MGR,OSD,MON ceph;
+    class PVE_Exp,HA_Exp,Node_Exp exporter;
+    class Prometheus,Grafana core;
+    class Metrics_Dir storage;
+```
+
+---
+
+## 8. Bảng Tra Cứu Chỉ Số Trọng Yếu (Metrics Catalog)
+
+Dưới đây là danh sách các Metrics (chỉ số) quan trọng nhất được thu thập bởi hệ thống, giúp bạn dễ dàng viết thêm các câu lệnh PromQL tùy chỉnh cho Grafana hoặc Alertmanager.
+
+### 8.1. Ceph Storage Metrics
+Các chỉ số từ cụm lưu trữ phân tán Ceph:
+
+| Metric | Mô tả | Đơn vị / Trạng thái |
+|--------|-------|---------------------|
+| `ceph_health_status` | Trạng thái sức khỏe cụm Ceph | `0`: OK, `1`: WARN, `2`: ERR |
+| `ceph_osd_up` | Số lượng OSD đang chạy (up) | Count (Số lượng) |
+| `ceph_osd_in` | Số lượng OSD nằm trong CRUSH Map | Count (Số lượng) |
+| `ceph_cluster_total_bytes` | Tổng dung lượng của toàn bộ cụm Ceph | Bytes |
+| `ceph_cluster_total_used_bytes` | Dung lượng Ceph đã sử dụng | Bytes |
+| `rate(ceph_osd_op_r[1m])` | Tốc độ đọc (Read IOPS) | IOPS |
+| `rate(ceph_osd_op_w[1m])` | Tốc độ ghi (Write IOPS) | IOPS |
+| `rate(ceph_osd_op_r_out_bytes[1m])` | Băng thông đọc (Read Bandwidth) | Bytes/sec |
+| `rate(ceph_osd_op_w_in_bytes[1m])` | Băng thông ghi (Write Bandwidth) | Bytes/sec |
+| `ceph_pool_bytes_used` | Dung lượng đã sử dụng của từng Pool | Bytes |
+
+### 8.2. Proxmox Virtual Environment (PVE) Metrics
+Các chỉ số liên quan đến tài nguyên vật lý và máy ảo trên Proxmox:
+
+| Metric | Mô tả | Đơn vị / Trạng thái |
+|--------|-------|---------------------|
+| `pve_node_up` | Trạng thái hoạt động của các Node PVE | `1`: Up, `0`: Down |
+| `pve_guest_status` | Trạng thái của VM/LXC (running, stopped) | `1`: Running, `0`: Stopped |
+| `pve_node_cpu_usage` | % CPU đang sử dụng của Node vật lý | Ratio (0.0 - 1.0) |
+| `pve_node_memory_total` | Tổng RAM của Node vật lý | Bytes |
+| `pve_node_memory_used` | RAM đang sử dụng của Node vật lý | Bytes |
+| `pve_guest_cpu_usage` | % CPU đang sử dụng của từng VM/LXC | Ratio (0.0 - 1.0) |
+| `pve_guest_memory_used` | RAM đang sử dụng của từng VM/LXC | Bytes |
+| `pve_storage_total` | Tổng dung lượng của các Storage (local, lvm, rbd...) | Bytes |
+| `pve_storage_used` | Dung lượng đã dùng của các Storage | Bytes |
+| `pve_version_info` | Thông tin phiên bản PVE đang chạy | Text / Label |
+
+### 8.3. Proxmox High Availability (HA) Metrics
+Các chỉ số trạng thái High Availability được thu thập thông qua script tùy chỉnh:
+
+| Metric | Mô tả | Đơn vị / Trạng thái |
+|--------|-------|---------------------|
+| `pve_ha_group_status` | Trạng thái của các HA Group | `1`: OK, `0`: Error |
+| `pve_ha_resource_status` | Trạng thái HA của từng Resource (VM/LXC) | `1`: Started, `0`: Stopped/Error |
+| `pve_ha_manager_status` | Trạng thái tiến trình LRM/CRM manager | `1`: Active, `0`: Inactive |
