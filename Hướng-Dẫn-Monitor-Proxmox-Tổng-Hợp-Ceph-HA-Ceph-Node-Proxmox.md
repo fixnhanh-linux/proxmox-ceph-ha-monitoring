@@ -1,6 +1,6 @@
 ---
-title: "🚀 Hệ Thống Giám Sát Proxmox & Ceph HA"
-slug: "-he-thong-giam-sat-proxmox-ceph-ha"
+title: "Hệ Thống Giám Sát Proxmox & Ceph HA"
+slug: "he-thong-giam-sat-proxmox-ceph-ha"
 ---
 # 🚀 Hệ Thống Giám Sát Proxmox & Ceph HA (Enterprise Edition)
 
